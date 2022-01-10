@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: consumer
+  name: consumer
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 3
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: consumer
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: consumer
+    spec:
+      containers:
+      - image: ariellyblabla/consumer:1.0
+        imagePullPolicy: Always
+        name: consumer
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        env:
+          - name: BROKERS_URL
+            value: broker:9092
+          - name: CLIENT_ID
+            value: consumer
+          - name: GROUP_ID
+            value: status
+          - name: TOPIC
+            value: status
+          - name: PARTITION
+            value: '10'
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
